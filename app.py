@@ -65,7 +65,7 @@ def view_event():
 def rsvp():
     res = request.json
     EventName = res['EventName']
-    UserName = res["USERNAME"]
+    UserName = res["UserName"]
 
     rsvp = event.rsvp(UserName=UserName, EventName=EventName)
     return rsvp
@@ -90,7 +90,7 @@ def userRSVP():
 def cancelReservation():
     req = request.json
     username = req['UserName']
-    eventname = req['Event_name']
+    eventname = req['EventName']
     res = event.cancelRsvp(username, eventname)
     return res
 
