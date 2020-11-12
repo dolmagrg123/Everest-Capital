@@ -143,136 +143,136 @@ class Event:
         }
 
 
-#Use these after user microservice is connected
-    # def rsvp(self, User, Event_name):
-    #     #print(User)
-    #     response = self.table.scan(
-    #         FilterExpression=Attr("event_name").eq(Event_name)
-    #     )
 
-    #     if response["Items"]:
+    def rsvp(self, UserName, EventName):
+        #print(User)
+        response = self.table.scan(
+            FilterExpression=Attr("eventName").eq(EventName)
+        )
 
-    #         if User in response['Items'][0]['RSVP']:
-    #             return {
-    #                 "Result": False,
-    #                 "Error": "Database error",
-    #                 "Description": "Cannot RSVP more than once"
-    #             }
+        if response["Items"]:
 
-    #         res = self.table.update_item(
-    #             Key={
-    #                 'event_name': Event_name,
+            if UserName in response['Items'][0]['RSVP']:
+                return {
+                    "Result": False,
+                    "Error": "Database error",
+                    "Description": "Cannot RSVP more than once"
+                }
 
-    #             },
+            res = self.table.update_item(
+                Key={
+                    'eventName': EventName,
 
-    #             UpdateExpression="set RSVP= list_append(RSVP, :s)",
-    #             ExpressionAttributeValues={
-    #                 ':s': [User]
-    #             }
-    #             #
-    #         )
-    #         # return res
-    #         if res["ResponseMetadata"]["HTTPStatusCode"] == 200:
-    #             return {
-    #                 "Result": True,
-    #                 "Error": None,
-    #                 "Description": "You Have RSVPd to this event"
-    #             }
-    #         else:
-    #             return {
-    #                 "Result": False,
-    #                 "Error": "Database error",
-    #                 "Description": "Database error"
-    #             }
-    #     else:
-    #         return {
-    #             "Result": False,
-    #             "Error": "Event not found",
-    #             "Description": "Cannot add rsvp"
-    #         }
+                },
 
-    # def getAllUserEvent(self, username):
-    #     response = self.table.scan()['Items']
-    #     lst = []
-    #     if len(response) > 0:
-    #         for d in response:
-    #             if d['User'] == username:
-    #                 lst.append(d)
-    #         return {
-    #             "Result": True,
-    #             "Error": None,
-    #             "Description": "All events this user created",
-    #             "EventsDB": lst
-    #         }
-    #     else:
-    #         return {
-    #             "Result": False,
-    #             "Error": "No events for this user",
-    #             "Description": "This user haven't post any event yet.",
-    #             "EventsDB": lst
-    #         }
+                UpdateExpression="set RSVP= list_append(RSVP, :s)",
+                ExpressionAttributeValues={
+                    ':s': [UserName]
+                }
+                #
+            )
+            # return res
+            if res["ResponseMetadata"]["HTTPStatusCode"] == 200:
+                return {
+                    "Result": True,
+                    "Error": None,
+                    "Description": "You Have RSVPd to this event"
+                }
+            else:
+                return {
+                    "Result": False,
+                    "Error": "Database error",
+                    "Description": "Database error"
+                }
+        else:
+            return {
+                "Result": False,
+                "Error": "Event not found",
+                "Description": "Cannot add rsvp"
+            }
 
-    # def getUserRvsp(self, username):
-    #     # get current user's rvsp
-    #     lst = []
-    #     response = self.table.scan()['Items']
-    #     for i in response:
-    #         if username in i['RSVP']:
-    #             lst.append(i)
+    def getAllUserEvent(self, username):
+        response = self.table.scan()['Items']
+        lst = []
+        if len(response) > 0:
+            for d in response:
+                if d['UserName'] == username:
+                    lst.append(d)
+            return {
+                "Result": True,
+                "Error": None,
+                "Description": "All events this user created",
+                "EventsDB": lst
+            }
+        else:
+            return {
+                "Result": False,
+                "Error": "No events for this user",
+                "Description": "This user haven't post any event yet.",
+                "EventsDB": lst
+            }
 
-    #     return {
-    #         "Result": True,
-    #         "Error": None,
-    #         "Description": "All RSVP for this user",
-    #         "RSVP": lst
-    #     }
-    #     #return response
+    def getUserRvsp(self, username):
+        # get current user's rvsp
+        lst = []
+        response = self.table.scan()['Items']
+        for i in response:
+            if username in i['RSVP']:
+                lst.append(i)
+
+        return {
+            "Result": True,
+            "Error": None,
+            "Description": "All RSVP for this user",
+            "RSVP": lst
+        }
+        #return response
 
 
-    # def cancelRsvp(self, username, eventname):
-    #     response = self.table.scan(
-    #         FilterExpression=Attr("event_name").eq(eventname)
-    #     )
-    #     try:
-    #         idx = response['Items'][0]['RSVP'].index(username)
-    #     except:
-    #         return {
-    #             "Result": False,
-    #             "Error": "User not found",
-    #             "Description": "User haven't make RSVP to this event yet"
-    #         }
+    def cancelRsvp(self, UserName, Eventname):
+        response = self.table.scan(
+            FilterExpression=Attr("eventName").eq(Eventname)
+        )
+        try:
+            idx = response['Items'][0]['RSVP'].index(UserName)
+        except:
+            return {
+                "Result": False,
+                "Error": "User not found",
+                "Description": "User haven't make RSVP to this event yet"
+            }
 
-    #     if response["Items"]:
-    #         statement = "REMOVE RSVP["+ str(idx)+ "]"
+        if response["Items"]:
+            statement = "REMOVE RSVP["+ str(idx)+ "]"
 
-    #         res = self.table.update_item(
-    #             Key={
-    #                 'event_name': eventname,
+            res = self.table.update_item(
+                Key={
+                    'eventName': Eventname,
 
-    #             },
+                },
 
-    #             UpdateExpression=statement,
+                UpdateExpression=statement,
 
-    #         )
-    #         # return res
-    #         if res["ResponseMetadata"]["HTTPStatusCode"] == 200:
-    #             return {
-    #                 "Result": True,
-    #                 "Error": None,
-    #                 "Description": "RSVP was cancelled successfully"
-    #             }
-    #         else:
-    #             return {
-    #                 "Result": False,
-    #                 "Error": "Database error",
-    #                 "Description": "Database error"
-    #             }
-    #     else:
-    #         return {
-    #             "Result": False,
-    #             "Error": "Event not found",
-    #             "Description": "Cannot cancel rsvp because event not found"
-    #         }
+            )
+            # return res
+            if res["ResponseMetadata"]["HTTPStatusCode"] == 200:
+                return {
+                    "Result": True,
+                    "Error": None,
+                    "Description": "RSVP was cancelled successfully"
+                }
+            else:
+                return {
+                    "Result": False,
+                    "Error": "Database error",
+                    "Description": "Database error"
+                }
+        else:
+            return {
+                "Result": False,
+                "Error": "Event not found",
+                "Description": "Cannot cancel rsvp because event not found"
+            }
 
 
 if __name__ == "__main__":
@@ -293,6 +293,13 @@ if __name__ == "__main__":
     #RSVp
     # res =event.rsvp("Ram", "Women In Tech Vs Finance")
 
-    
+    #get all usre event
+    # res =event.getAllUserEvent("RAM")
 
-# print (res)
+    #get all user rsvp
+    # res = event.getUserRvsp("Ram")
+
+    #cancelRSVP
+    res = event.cancelRsvp("Ram", "Women In Tech Vs Finance")
+
+print (res)
